@@ -41,6 +41,7 @@ protected:
 
 private slots:
     void boardCleaned();
+    void chessPlaced();
 
 signals:
     void mouseClicked();
