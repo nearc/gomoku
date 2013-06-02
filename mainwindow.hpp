@@ -2,9 +2,9 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
-#include <QPainter>
-#include <vector>
 
+#include <vector>
+#include <QPainter>
 namespace Ui {
 class MainWindow;
 }
@@ -22,15 +22,12 @@ private:
     //void setFixedHeight(int);
     //void setFixedWidth(int);
     Ui::MainWindow *ui;
-    size_t countTurns;
+    size_t countTurns;//当前的回合数
+    size_t totTime;//每人的时间上限
 
     QPixmap bChess;
     QPixmap wChess;
     QPixmap board;
-    QPainter paint;
-
-    int actX;
-    int actY;
 
     //*利用vetor+二进制的思想存放棋盘和棋子颜色的情况
     //*比如boardState.at(0)==9==8+1
@@ -46,10 +43,14 @@ protected:
 private slots:
     void boardCleaned();//用于清空棋盘
     void chessPlaced();//用于向胜负判断函数传递有新子落下的消息
-
+    void setTimeConstraint(int);
+    void countDown();
+    void on_btnExit_clicked();
+    void timeoutMsg(int);
 signals:
     void mouseClicked();
-
+    void newGameClicked(int);
+    void timeoutPlayer(int);
 };
 
 #endif // MAINWINDOW_HPP

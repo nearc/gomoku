@@ -36,13 +36,13 @@
      <string/>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>30</y>
+      <x>591</x>
+      <y>31</y>
       <width>140</width>
-      <height>501</height>
+      <height>432</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -81,7 +81,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLCDNumber" name="lcdTimeA"/>
+          <widget class="QLCDNumber" name="lcdTimeA">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -105,7 +109,20 @@
           </widget>
          </item>
          <item>
-          <widget class="QLCDNumber" name="lcdTimeB"/>
+          <widget class="QLCDNumber" name="lcdTimeB">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>false</bool>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Filled</enum>
+           </property>
+           <property name="value" stdset="0">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
