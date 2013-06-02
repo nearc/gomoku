@@ -41,7 +41,8 @@ protected:
     void mousePressEvent(QMouseEvent *);
 
 private slots:
-    void boardCleaned();//用于清空棋盘
+    void boardCleaned();//用于清空棋盘,开始新局
+    //void startNewGame();
     void chessPlaced();//用于向胜负判断函数传递有新子落下的消息
     void setTimeConstraint(int);
     void countDown();
@@ -51,6 +52,7 @@ signals:
     void mouseClicked();
     void newGameClicked(int);
     void timeoutPlayer(int);
+    void oneGameFinished();
 };
 
 #endif // MAINWINDOW_HPP

@@ -20,12 +20,16 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setFixedWidth(800);
     ui->setupUi(this);
     countTurns = 0;
+    totTime = 0;//never played once
 
     //black plays first
     ui->lbPlayerNowPng->setPixmap(bChess);
 
+    timer->setInterval(10);
 
     connect(ui->btnNewGame, SIGNAL(clicked()), this, SLOT(boardCleaned())) ;
+    connect(ui->btnNewGame, SIGNAL(clicked()), timer, SLOT(start()));
+    //connect(ui->btnNewGame, SIGNAL(clicked()), this, SLOT(startNewGame()));
     connect(this, SIGNAL(mouseClicked()), this, SLOT(chessPlaced()));
 
     //set timeConstraint
@@ -39,9 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
     m->setMapping(ui->rbTwentyMin, 4);
     connect(m, SIGNAL(mapped(int)), this , SLOT(setTimeConstraint(int)));
 
-    timer->start(1000);
+
     connect(timer, SIGNAL(timeout()), this, SLOT(countDown()));
     connect(this, SIGNAL(timeoutPlayer(int)), this, SLOT(timeoutMsg(int)));
+    connect(this, SIGNAL(oneGameFinished()), this, SLOT(boardCleaned()));
+    connect(this, SIGNAL(oneGameFinished()), timer, SLOT(stop()));
 }
 
 MainWindow::~MainWindow()
@@ -52,37 +58,39 @@ MainWindow::~MainWindow()
 void MainWindow::timeoutMsg(int p){
     char ch;
 
-    if (p==1) ch='A';
-        else ch='B';
+    if (p==1) ch='B';
+        else ch='A';
     QMessageBox msg;
     msg.setText(tr("玩家")+ch+tr("时间到"));
     msg.exec();
-
+    emit(oneGameFinished());
 
 }
 
 void MainWindow::countDown(){
     int nowPlayer = countTurns &1;//mod2, 1--black, 0--white;
-    int timeR;
+    int timeRA, timeRB;
     qDebug()<<"countDown: "<<countTurns<<endl;
+    timeRA = ui->lcdTimeA->intValue();
+    timeRB = ui->lcdTimeB->intValue();
 
-    if (countTurns>0 && nowPlayer == 0){
-        timeR = ui->lcdTimeA->intValue();
-        if (timeR>0){
-            ui->lcdTimeA->display(timeR-1);
-        }
-        else{
-            emit(timeoutPlayer(0));
-        }
+    if (timeRA>0 || timeRB>0){
+        if (nowPlayer == 0){
+            if (timeRA>0){
+                ui->lcdTimeA->display(timeRA-1);
+            }
+            else{
+                emit(timeoutPlayer(0));
+            }
 
-    }
-    else {
-        timeR = ui->lcdTimeB->intValue();
-        if (timeR>0){
-            ui->lcdTimeB->display(timeR-1);
         }
-        else{
-            emit(timeoutPlayer(1));
+        else {
+            if (timeRB>0){
+                ui->lcdTimeB->display(timeRB-1);
+            }
+            else{
+                emit(timeoutPlayer(1));
+            }
         }
     }
 }
@@ -95,7 +103,7 @@ void MainWindow::mousePressEvent(QMouseEvent *m){
     int actX = (tempX-60)/25;//0--18
     int actY = (tempY-65)/25;//0--18
 
-    if (actX>=0 && actX<=18 && actY>=0 && actY <=18
+    if (totTime>0 && actX>=0 && actX<=18 && actY>=0 && actY <=18
             &&((boardState.at(actX)&(1 << actY)) ==0) ){
 
         boardState.at(actX)+= 1 << actY;
@@ -145,6 +153,8 @@ void MainWindow::boardCleaned(){
 void MainWindow::paintEvent(QPaintEvent * ev){
     QPainter p(this);
     p.drawPixmap(41,31,board);
+
+    ev->accept();
 
     for (int i=0; i<19; i++){
         for (int j=0; j<19; j++){
