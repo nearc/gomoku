@@ -18,6 +18,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    const std::vector <int> getBoardState() const;
+    const std::vector <int> getColorState() const;
+
 private:
     //void setFixedHeight(int);
     //void setFixedWidth(int);

@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp\
+    judgeRule.cpp
 
 
-HEADERS  += mainwindow.hpp
+HEADERS  += mainwindow.hpp \
+    judgeRule.hpp
 
 FORMS    += mainwindow.ui
 RESOURCES += board.qrc

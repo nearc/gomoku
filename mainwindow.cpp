@@ -1,5 +1,7 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
+#include "judgeRule.hpp"
+
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPixmap>
@@ -25,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //black plays first
     ui->lbPlayerNowPng->setPixmap(bChess);
 
-    timer->setInterval(10);
+    timer->setInterval(1000);
 
     connect(ui->btnNewGame, SIGNAL(clicked()), this, SLOT(boardCleaned())) ;
     connect(ui->btnNewGame, SIGNAL(clicked()), timer, SLOT(start()));
@@ -126,7 +128,11 @@ void MainWindow::mousePressEvent(QMouseEvent *m){
     emit mouseClicked();
 }
 
+//当前有新的棋子落下，将更新的信息传给胜负判断的函数
 void MainWindow::chessPlaced(){
+    judgeRule jr;
+
+    jr.getState(this);
     qDebug()<<"chessPlaced:"<<countTurns;
 }
 
