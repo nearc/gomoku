@@ -2,6 +2,8 @@
 #define JUDGERULE_HPP
 
 #include "mainwindow.hpp"
+#include <vector>
+#include <cmath>
 //*     包含了所有关于ui的信息
 //*     当有新的棋子落下的时候，会调用一次judgeRule::getState(MainWindow*)和judgeRule::Winner()
 //*
@@ -10,7 +12,10 @@
 class judgeRule{
 
 public:
-    const int getState(MainWindow* m);
+    explicit judgeRule();
+    void getState(MainWindow* m);
+    const int getWinner() const;
+//    void chessPlaced(size_t cX, size_t cY);
     //*     在MainWindow类下我提供了两个public函数
     //*     const std::vector <int> getBoardState() const;
     //*     用于返回当前棋盘某坐标下是否有棋子的信息, 1--有, 0--空
@@ -24,6 +29,8 @@ public:
     //*     1--black, 0--white, 这之外的数字表示目前还没有人获胜
 
     //*     测试的时候为了便于调试，你可以先手动输入棋盘的信息作为测试数据
-
+private:
+    int Winner;//1--black, 0--white, 2目前还无人获胜
+   // static std::vector <int> lastState;
 };
 #endif // JUDGERULE_HPP

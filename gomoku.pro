@@ -14,11 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp\
-    judgeRule.cpp
+    judgeRule.cpp \
+   #gomokugame.cpp
 
 
 HEADERS  += mainwindow.hpp \
-    judgeRule.hpp
+    judgeRule.hpp \
+   #gomokugame.hpp
 
 FORMS    += mainwindow.ui
 RESOURCES += board.qrc

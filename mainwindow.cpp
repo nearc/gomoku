@@ -52,19 +52,28 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(oneGameFinished()), timer, SLOT(stop()));
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
 }
 
-const std::vector<int> MainWindow::getBoardState() const
-{
+const std::vector<int> MainWindow::getBoardState() const{
     return boardState;
 }
 
-const std::vector<int> MainWindow::getColorState() const
-{
+const std::vector<int> MainWindow::getColorState() const{
     return colorState;
+}
+
+const int MainWindow::nowPlayer() const{
+    return (this->countTurns & 1);
+}
+
+const int MainWindow::getLastX() const{
+    return this->actX;
+}
+
+const int MainWindow::getLastY() const{
+    return this->actY;
 }
 
 
@@ -113,10 +122,9 @@ void MainWindow::countDown(){
 void MainWindow::mousePressEvent(QMouseEvent *m){
     int tempX=m->pos().x();
     int tempY=m->pos().y();
-    int nowPlayer;//1--black, 0--white
 
-    int actX = (tempX-60)/25;//0--18
-    int actY = (tempY-65)/25;//0--18
+    actX = (tempX-60)/25;//0--18
+    actY = (tempY-65)/25;//0--18
 
     if (totTime>0 && actX>=0 && actX<=18 && actY>=0 && actY <=18
             &&((boardState.at(actX)&(1 << actY)) ==0) ){
@@ -124,8 +132,8 @@ void MainWindow::mousePressEvent(QMouseEvent *m){
         boardState.at(actX)+= 1 << actY;
 
         countTurns++;
-        nowPlayer = countTurns & 1;//mod 2, 1--black, 0--white;
-        if (nowPlayer ==1){
+        //nowPlayer = countTurns & 1;//mod 2, 1--black, 0--white;
+        if (this->nowPlayer() == 1){
             colorState.at(actX) |= 1 << actY;//black
             update();
             ui->lbPlayerNowPng->setPixmap(wChess);//next->>white
@@ -135,10 +143,8 @@ void MainWindow::mousePressEvent(QMouseEvent *m){
             ui->lbPlayerNowPng->setPixmap(bChess);//next->>black
             update();
         }
-
+        emit mouseClicked();
     }
-
-    emit mouseClicked();
 }
 
 //当前有新的棋子落下，将更新的信息传给胜负判断的函数
@@ -147,7 +153,7 @@ void MainWindow::chessPlaced(){
     int Winner;
 
     Winner = jr.getState(this);
-    qDebug()<<"chessPlaced:"<<Winner;
+    qDebug()<<"Winner:"<<Winner;
     qDebug()<<"chessPlaced:"<<countTurns;
 }
 
@@ -171,12 +177,16 @@ void MainWindow::boardCleaned(){
     //qDebug()<<"newGameClicker "<<totTime*1000;
 }
 
+//*绘画棋盘和棋子
 void MainWindow::paintEvent(QPaintEvent * ev){
     QPainter p(this);
+    //*画棋盘
     p.drawPixmap(41,31,board);
 
     ev->accept();
 
+    //*画棋子
+    //*永远根据boardState和colorState绘制新的棋盘
     for (int i=0; i<19; i++){
         for (int j=0; j<19; j++){
             int drawX = i*25+65;

@@ -21,6 +21,12 @@ public:
     const std::vector <int> getBoardState() const;
     const std::vector <int> getColorState() const;
 
+    //*返回当前玩家————即将落子
+    //*奇数表示黑色刚下完，偶数表示白色刚下完
+    const int nowPlayer() const;//1 black, 0 white
+    const int getLastX() const;
+    const int getLastY() const;
+
 private:
     //void setFixedHeight(int);
     //void setFixedWidth(int);
@@ -31,6 +37,10 @@ private:
     QPixmap bChess;
     QPixmap wChess;
     QPixmap board;
+
+    //*最近一次落子的坐标
+    int actX;
+    int actY;
 
     //*利用vetor+二进制的思想存放棋盘和棋子颜色的情况
     //*比如boardState.at(0)==9==8+1
