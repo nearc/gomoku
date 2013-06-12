@@ -57,6 +57,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+const std::vector<int> MainWindow::getBoardState() const
+{
+    return boardState;
+}
+
+const std::vector<int> MainWindow::getColorState() const
+{
+    return colorState;
+}
+
+
+
+//输出某玩家时间到的对话框
 void MainWindow::timeoutMsg(int p){
     char ch;
 
@@ -66,9 +79,9 @@ void MainWindow::timeoutMsg(int p){
     msg.setText(tr("玩家")+ch+tr("时间到"));
     msg.exec();
     emit(oneGameFinished());
-
 }
 
+//倒计时模块，产生当前具体哪个玩家时间到的信号
 void MainWindow::countDown(){
     int nowPlayer = countTurns &1;//mod2, 1--black, 0--white;
     int timeRA, timeRB;
@@ -131,8 +144,10 @@ void MainWindow::mousePressEvent(QMouseEvent *m){
 //当前有新的棋子落下，将更新的信息传给胜负判断的函数
 void MainWindow::chessPlaced(){
     judgeRule jr;
+    int Winner;
 
-    jr.getState(this);
+    Winner = jr.getState(this);
+    qDebug()<<"chessPlaced:"<<Winner;
     qDebug()<<"chessPlaced:"<<countTurns;
 }
 
