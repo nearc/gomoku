@@ -6,8 +6,7 @@ judgeRule::judgeRule():lastState(20, 0), Winner(2){
 
 }
 
-void judgeRule::getState(MainWindow* m)
-//void judgeRule::getState(MainWindow* m)
+int judgeRule::Winner()
 {
 //	int difference;
     size_t row, col;
@@ -16,9 +15,6 @@ void judgeRule::getState(MainWindow* m)
 	int nColor, tColor;
 	int tState;
     //static std::vector<int> LastState;
-    std::vector<int> ThisState(m->getBoardState());
-    std::vector<int> ThisColor(m->getColorState());
-
 //    ThisState = m.getBoardState();
 //    ThisColor = m.getColorState();
 //    for(row=0;row<ThisState.size();row++){
@@ -51,9 +47,7 @@ void judgeRule::getState(MainWindow* m)
 		else break;
 	}
     if(count >= 4){
-        Winner = nColor;
-        return ;
-        //return nColor;
+        return nColor;
     }
 
 	count = 0;
@@ -72,9 +66,7 @@ void judgeRule::getState(MainWindow* m)
 		else break;
 	}
     if(count >= 4){
-        Winner = nColor;
-        return;
-        //return nColor;
+        return nColor;
     }
 	count = 0;
 	for(step = 1;step<=4;step++){
@@ -92,8 +84,7 @@ void judgeRule::getState(MainWindow* m)
 		else break;
 	}
     if(count >= 4){
-        Winner = nColor;
-        return;
+        return nColor;
     }
 	count = 0;
 	for(step = 1;step<=4;step++){
@@ -111,13 +102,24 @@ void judgeRule::getState(MainWindow* m)
 		else break;
 	}
     if(count >= 4){
-        Winner = nColor;
-        return;
+        return nColor;
     }
-    Winner = 2;
+    return 2;
 }
 
-const int judgeRule::getWinner() const{
-    return this->Winner;
+
+void judgeRule::chessPlaced(int actX, int actY, int nP){
+    if (actX>=0 && actX<=18 && actY>=0 && actY <=18
+            &&((boardState.at(actX)&(1 << actY)) ==0) ){
+
+        boardState.at(actX)+= 1 << actY;
+
+        if (nP == 1){
+            colorState.at(actX) |= 1 << actY;//black
+        }
+        else {
+            colorState.at(actX) &= ((1 << 19)-1)- (1<<actY);//white
+        }
+    }
 }
 
