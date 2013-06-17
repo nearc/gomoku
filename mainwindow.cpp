@@ -1,6 +1,5 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
-#include "judgeRule.hpp"
 
 #include <QDebug>
 #include <QMouseEvent>
@@ -13,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     bChess(":/png/chessBlack.png"), wChess(":/png/chessWhite.png"), board(":/png/chess.png"),
-    boardState(20,0), colorState(20,0)
+    winBoardState(20,0), winColorState(20,0)
 {    
     QSignalMapper *m = new QSignalMapper(this);
     QTimer *timer = new QTimer(this);
@@ -32,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->btnNewGame, SIGNAL(clicked()), this, SLOT(boardCleaned())) ;
     connect(ui->btnNewGame, SIGNAL(clicked()), timer, SLOT(start()));
     //connect(ui->btnNewGame, SIGNAL(clicked()), this, SLOT(startNewGame()));
-    connect(this, SIGNAL(mouseClicked()), this, SLOT(chessPlaced()));
+    //connect(this, SIGNAL(mouseClicked()), this, SLOT(chessPlaced()));
 
     //set timeConstraint
     connect(ui->rbFiveMin, SIGNAL(clicked()), m, SLOT(map()));
@@ -57,25 +56,45 @@ MainWindow::~MainWindow(){
 }
 
 const std::vector<int> MainWindow::getBoardState() const{
-    return boardState;
+    return winBoardState;
 }
 
 const std::vector<int> MainWindow::getColorState() const{
-    return colorState;
+    return winColorState;
 }
 
-const int MainWindow::nowPlayer() const{
+int MainWindow::nowPlayer() const{
     return (this->countTurns & 1);
 }
 
-const int MainWindow::getLastX() const{
+int MainWindow::getLastX() const{
     return this->actX;
 }
 
-const int MainWindow::getLastY() const{
+int MainWindow::getLastY() const{
     return this->actY;
 }
 
+int MainWindow::getCountTurns() const{
+    return this->countTurns;
+}
+
+void MainWindow::someoneWin(const int w){
+    char ch;
+    if (w==2){
+
+    }
+    else {
+        if (w==1) ch='B';
+            else ch='A';
+        QMessageBox msg;
+        msg.setText(tr("玩家")+ch+tr("获胜"));
+        msg.exec();
+
+        emit oneGameFinished();
+    }
+
+}
 
 
 //输出某玩家时间到的对话框
@@ -122,39 +141,35 @@ void MainWindow::countDown(){
 void MainWindow::mousePressEvent(QMouseEvent *m){
     int tempX=m->pos().x();
     int tempY=m->pos().y();
-
+    int nP = this->nowPlayer();
     actX = (tempX-60)/25;//0--18
     actY = (tempY-65)/25;//0--18
 
     if (totTime>0 && actX>=0 && actX<=18 && actY>=0 && actY <=18
-            &&((boardState.at(actX)&(1 << actY)) ==0) ){
+            &&((winBoardState.at(actX)&(1 << actY)) ==0) ){
 
-        boardState.at(actX)+= 1 << actY;
+        winBoardState.at(actX)+= 1 << actY;
+        judgeRule jr;
+        jr.chessPlaced(countTurns, actX, actY, nP);
 
         countTurns++;
         //nowPlayer = countTurns & 1;//mod 2, 1--black, 0--white;
         if (this->nowPlayer() == 1){
-            colorState.at(actX) |= 1 << actY;//black
+            winColorState.at(actX) |= 1 << actY;//black
             update();
             ui->lbPlayerNowPng->setPixmap(wChess);//next->>white
         }
         else {
-            colorState.at(actX) &= ((1 << 19)-1)- (1<<actY);//white
+            winColorState.at(actX) &= ((1 << 19)-1)- (1<<actY);//white
             ui->lbPlayerNowPng->setPixmap(bChess);//next->>black
             update();
         }
+
+        int w = jr.Winner(actX, actY, nP);
+        this->someoneWin(w);
+
         emit mouseClicked();
     }
-}
-
-//当前有新的棋子落下，将更新的信息传给胜负判断的函数
-void MainWindow::chessPlaced(){
-    judgeRule jr;
-    int Winner;
-
-    Winner = jr.getState(this);
-    qDebug()<<"Winner:"<<Winner;
-    qDebug()<<"chessPlaced:"<<countTurns;
 }
 
 void MainWindow::setTimeConstraint(int t){
@@ -164,9 +179,9 @@ void MainWindow::setTimeConstraint(int t){
 
 void MainWindow::boardCleaned(){
     for (int i=0; i<19; i++)
-        boardState.at(i)=0;
+        winBoardState.at(i)=0;
     for (int i=0; i<19; i++)
-        colorState.at(i)=0;
+        winColorState.at(i)=0;
     countTurns = 0;
 
     ui->lbPlayerNowPng->setPixmap(bChess);
@@ -191,8 +206,8 @@ void MainWindow::paintEvent(QPaintEvent * ev){
         for (int j=0; j<19; j++){
             int drawX = i*25+65;
             int drawY = j*25+70;
-            if (((boardState.at(i)&(1 << j)) !=0)){//确定当前位置有落子
-                if ((colorState.at(i) & (1<<j)) !=0){//1--black
+            if (((winBoardState.at(i)&(1 << j)) !=0)){//确定当前位置有落子
+                if ((winColorState.at(i) & (1<<j)) !=0){//1--black
                     p.drawPixmap(drawX, drawY, bChess);
                 }
                 else {//0--white

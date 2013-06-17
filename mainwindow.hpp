@@ -5,6 +5,8 @@
 
 #include <vector>
 #include <QPainter>
+#include <judgeRule.hpp>
+
 namespace Ui {
 class MainWindow;
 }
@@ -23,9 +25,11 @@ public:
 
     //*返回当前玩家————即将落子
     //*奇数表示黑色刚下完，偶数表示白色刚下完
-    const int nowPlayer() const;//1 black, 0 white
-    const int getLastX() const;
-    const int getLastY() const;
+    int nowPlayer() const;//1 black, 0 white
+    int getLastX() const;
+    int getLastY() const;
+    int getCountTurns() const;
+    void someoneWin(const int w);
 
 private:
     //void setFixedHeight(int);
@@ -46,8 +50,8 @@ private:
     //*比如boardState.at(0)==9==8+1
     //*表示第一行的1, 4有落子
     //*颜色的表达也类似
-    std::vector<int> boardState;//0 no chess, 1 engaged
-    std::vector<int> colorState;//1 black, 0 white
+    std::vector<int> winBoardState;//0 no chess, 1 engaged
+    std::vector<int> winColorState;//1 black, 0 white
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -56,14 +60,14 @@ protected:
 private slots:
     void boardCleaned();//用于清空棋盘,开始新局
     //void startNewGame();
-    void chessPlaced();//用于向胜负判断函数传递有新子落下的消息
+   // void chessPlaced();//用于向胜负判断函数传递有新子落下的消息
     void setTimeConstraint(int);
     void countDown();
     void on_btnExit_clicked();
     void timeoutMsg(int);
 signals:
     void mouseClicked();
-    void newGameClicked(int);
+//    void newGameClicked(int);
     void timeoutPlayer(int);
     void oneGameFinished();
 };

@@ -6,5 +6,6 @@
         <file>chessBlack.png</file>
         <file>chessWhite.png</file>
         <file>chess.png</file>
+        <file>logo.png</file>
     </qresource>
 </RCC>
